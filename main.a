@@ -1,0 +1,34 @@
+macro neovimhack {
+	asmsyntax=fasm
+}
+
+format ELF64 executable
+print:
+	mov rax, 1234567890 ; input value
+	mov r14, num
+	mov r15, 20
+	mov byte [r14+r15], 0x0A
+.repeat:
+	dec r15
+	xor rdx, rdx
+	mov rcx, 10
+	div rcx
+	add rdx, 48
+	mov byte [r14+r15], dl
+	test rax, rax
+jnz .repeat
+.write:
+	mov rax, 1 ; write
+	mov rdi, 1 ; stdout
+	mov rsi, r14
+	add rsi, r15 ; buffer
+	mov r13, 21
+	sub r13, r15
+	mov rdx, r13 ; length
+.exit:
+	syscall
+	mov rax, 60 ; exit
+	mov rdi, 0 ; status
+	syscall
+
+num rb 21 ; 20 bytes for numbers plus byte for newline character (0x0A)
